@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 90" fill="none" aria-hidden="true">
+  <!--
+    Stylized cursive "SB" nach braum.x Brand-Guidelines.
+    Cream stroke + Mint terminator dot. Einzel-Pfad-Kalligraphie.
+  -->
+  <path d="
+    M 20 50
+    C 15 38, 28 28, 42 32
+    C 55 36, 55 48, 44 52
+    C 33 56, 26 58, 34 66
+    C 42 73, 58 72, 70 64
+
+    M 92 22
+    C 92 22, 90 70, 90 70
+    C 90 60, 100 38, 116 36
+    C 128 35, 134 44, 126 52
+    C 118 56, 104 56, 104 56
+    C 120 56, 138 62, 134 72
+    C 128 80, 110 76, 94 72
+
+    M 160 72
+    C 180 72, 200 72, 250 72
+  " />
+  <circle class="dot-mint" cx="258" cy="72" r="3.5" />
+</svg>

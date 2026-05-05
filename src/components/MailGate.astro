@@ -1,0 +1,238 @@
+---
+/**
+ * MailGate · Self-contained name-gate + math-captcha + mail reveal.
+ *
+ * Reused inline in the routing card and as the standalone /mail page.
+ * Multiple instances on one page work — each [data-mail-gate] gets its own state.
+ */
+
+interface Props {
+  /** "compact" (inside routing card) | "standalone" (full /mail page) */
+  variant?: "compact" | "standalone";
+}
+
+const { variant = "compact" } = Astro.props;
+---
+
+<div class="mail-gate" data-mail-gate data-variant={variant}>
+  <div class="segmented" role="tablist" aria-label="Art der Anfrage">
+    <button type="button" class="segmented-btn is-active" data-type="personal" role="tab" aria-selected="true">
+      Persönlich
+    </button>
+    <button type="button" class="segmented-btn" data-type="consulting" role="tab" aria-selected="false">
+      Consulting
+    </button>
+  </div>
+
+  <form class="mail-form" autocomplete="off" novalidate data-mail-form>
+    <input
+      type="text"
+      class="mail-input"
+      placeholder="Dein Name"
+      aria-label="Dein Name"
+      autocapitalize="words"
+      autocomplete="name"
+      spellcheck="false"
+      maxlength="120"
+      required
+      data-mail-name
+    />
+
+    <label class="captcha-row" data-captcha-row>
+      <span class="captcha-label" aria-hidden="true">Sicherheitscheck</span>
+      <span class="captcha-prompt" data-captcha-prompt>· · ·</span>
+      <span class="captcha-equals" aria-hidden="true">=</span>
+      <input
+        type="text"
+        inputmode="numeric"
+        pattern="[0-9]*"
+        class="captcha-input"
+        aria-label="Ergebnis"
+        autocomplete="off"
+        spellcheck="false"
+        maxlength="3"
+        required
+        data-captcha-answer
+      />
+    </label>
+
+    <button type="submit" class="mail-btn" data-mail-submit>
+      <span data-mail-submit-label>Mail zeigen →</span>
+    </button>
+  </form>
+
+  <div class="mail-result" aria-live="polite" data-mail-result></div>
+</div>
+
+<script>
+  type ContactType = "personal" | "consulting";
+  type ContactOk = {
+    ok: true;
+    type: ContactType;
+    email: string;
+    emails: { personal: string; consulting: string };
+  };
+  type ContactErr = { ok: false; error: string; retryAfter?: number; captchaFailed?: boolean };
+  type CaptchaOk = { ok: true; prompt: string; token: string };
+
+  declare global {
+    interface Window {
+      umami?: {
+        track: (name: string, data?: Record<string, unknown>) => void;
+      };
+    }
+  }
+
+  function track(event: string, data?: Record<string, unknown>) {
+    try {
+      window.umami?.track(event, data);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  function escapeHtml(s: string): string {
+    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  function subjectFor(type: ContactType, name: string): string {
+    return encodeURIComponent(
+      type === "consulting" ? `Erstgespräch Consulting · ${name}` : `Kontaktaufnahme von ${name}`,
+    );
+  }
+
+  function metaFor(type: ContactType): string {
+    return type === "consulting" ? "Consulting · Mail öffnen" : "Mail öffnen";
+  }
+
+  function introFor(type: ContactType, safeName: string): string {
+    return type === "consulting"
+      ? `Danke, <strong>${safeName}</strong>. Schreib mir kurz dein Vorhaben, ich melde mich innerhalb von 24h mit Terminvorschlag.`
+      : `Danke, <strong>${safeName}</strong>. Ich antworte persönlich innerhalb von 24h.`;
+  }
+
+  function initGate(gate: HTMLElement) {
+    const segBtns = gate.querySelectorAll<HTMLButtonElement>(".segmented-btn");
+    const formMaybe = gate.querySelector<HTMLFormElement>("[data-mail-form]");
+    const nameMaybe = gate.querySelector<HTMLInputElement>("[data-mail-name]");
+    const promptMaybe = gate.querySelector<HTMLElement>("[data-captcha-prompt]");
+    const answerMaybe = gate.querySelector<HTMLInputElement>("[data-captcha-answer]");
+    const submitMaybe = gate.querySelector<HTMLButtonElement>("[data-mail-submit]");
+    const submitLabelMaybe = gate.querySelector<HTMLElement>("[data-mail-submit-label]");
+    const resultMaybe = gate.querySelector<HTMLElement>("[data-mail-result]");
+    if (!formMaybe || !nameMaybe || !promptMaybe || !answerMaybe || !submitMaybe || !submitLabelMaybe || !resultMaybe) return;
+    const form = formMaybe;
+    const nameInput = nameMaybe;
+    const captchaPrompt = promptMaybe;
+    const captchaAnswer = answerMaybe;
+    const submitBtn = submitMaybe;
+    const submitLabel = submitLabelMaybe;
+    const resultEl = resultMaybe;
+
+    let type: ContactType = "personal";
+    let captchaToken: string | null = null;
+    let success: { name: string; emails: { personal: string; consulting: string } } | null = null;
+
+    async function loadCaptcha() {
+      captchaPrompt.textContent = "lädt …";
+      try {
+        const res = await fetch("/api/captcha", { headers: { Accept: "application/json" } });
+        if (!res.ok) throw new Error(`captcha ${res.status}`);
+        const data = (await res.json()) as CaptchaOk;
+        captchaToken = data.token;
+        captchaPrompt.textContent = data.prompt;
+        captchaAnswer.value = "";
+      } catch {
+        captchaPrompt.textContent = "offline";
+        captchaToken = null;
+      }
+    }
+
+    function renderSuccess() {
+      if (!success) return;
+      const safeName = escapeHtml(success.name);
+      const email = type === "consulting" ? success.emails.consulting : success.emails.personal;
+      const subject = subjectFor(type, success.name);
+      const meta = metaFor(type);
+      resultEl.innerHTML = `
+        <p class="mail-intro">${introFor(type, safeName)}</p>
+        <a class="mail-reveal" href="mailto:${email}?subject=${subject}">
+          <span class="mail-reveal-addr">${email}</span>
+          <span class="mail-reveal-meta">${meta} ↗</span>
+        </a>
+      `;
+    }
+
+    segBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        segBtns.forEach((b) => {
+          b.classList.remove("is-active");
+          b.setAttribute("aria-selected", "false");
+        });
+        btn.classList.add("is-active");
+        btn.setAttribute("aria-selected", "true");
+        type = (btn.dataset.type as ContactType) ?? "personal";
+        if (success) renderSuccess();
+      });
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (success) return; // already revealed; segment-switch handles re-render
+      const name = nameInput.value.trim();
+      const answer = captchaAnswer.value.trim();
+      if (name.length < 2) {
+        resultEl.innerHTML = `<div class="mail-error">// Bitte Namen angeben (min. 2 Zeichen).</div>`;
+        nameInput.focus();
+        return;
+      }
+      if (!captchaToken) {
+        resultEl.innerHTML = `<div class="mail-error">// Sicherheitscheck nicht geladen. Versuch's nochmal.</div>`;
+        loadCaptcha();
+        return;
+      }
+      if (!/^\d+$/.test(answer)) {
+        resultEl.innerHTML = `<div class="mail-error">// Sicherheitscheck: Ergebnis als Zahl.</div>`;
+        captchaAnswer.focus();
+        return;
+      }
+
+      submitBtn.setAttribute("aria-busy", "true");
+      submitLabel.textContent = "Moment …";
+      resultEl.innerHTML = "";
+
+      try {
+        const res = await fetch("/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, type, captchaToken, captchaAnswer: answer }),
+        });
+        const data = (await res.json()) as ContactOk | ContactErr;
+
+        if (!res.ok || !data.ok) {
+          const msg = (data as ContactErr).error ?? "// Etwas ist schiefgelaufen.";
+          resultEl.innerHTML = `<div class="mail-error">${msg}</div>`;
+          submitBtn.removeAttribute("aria-busy");
+          submitLabel.textContent = "Mail zeigen →";
+          if ((data as ContactErr).captchaFailed) loadCaptcha();
+          return;
+        }
+
+        const eventName = type === "consulting" ? `Consulting · ${name}` : `Kontakt · ${name}`;
+        track(eventName, { name, type });
+
+        success = { name, emails: data.emails };
+        form.remove();
+        renderSuccess();
+      } catch {
+        resultEl.innerHTML = `<div class="mail-error">// Verbindung fehlgeschlagen. Versuch's nochmal.</div>`;
+        submitBtn.removeAttribute("aria-busy");
+        submitLabel.textContent = "Mail zeigen →";
+      }
+    });
+
+    loadCaptcha();
+  }
+
+  document.querySelectorAll<HTMLElement>("[data-mail-gate]").forEach(initGate);
+</script>

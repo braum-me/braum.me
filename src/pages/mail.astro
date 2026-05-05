@@ -1,0 +1,82 @@
+---
+import { getContact } from "~/lib/contact.ts";
+import MailGate from "../components/MailGate.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const contact = getContact();
+const linkedinUrl = contact.urlLinkedin || "https://linkedin.com";
+---
+
+<BaseLayout
+  title="Stefan Braum erreichen · braum.me/mail"
+  description="Persönlich oder Consulting. Name eingeben, Mail bekommen. Oder direkt via LinkedIn."
+>
+  <main class="stage stage-mail">
+    <article class="mail-card" aria-label="Stefan Braum erreichen">
+      <header class="mail-card-header">
+        <a href="/" class="brand-mono" aria-label="braum.me · Start">
+          <span class="monogram">SB<span class="dot">.</span></span>
+        </a>
+      </header>
+
+      <section class="mail-card-intro">
+        <h1 class="mail-card-title">Stefan erreichen<span class="dot">.</span></h1>
+        <p class="mail-card-sub">
+          Persönlich oder Consulting. Name eingeben, kurzer Sicherheitscheck, Mail kommt.
+        </p>
+      </section>
+
+      <MailGate variant="standalone" />
+
+      <div class="mail-divider" role="separator" aria-label="oder">
+        <span class="mail-divider-text">oder ohne Sicherheitscheck</span>
+      </div>
+
+      <a
+        class="mail-fallback"
+        id="mailFallback"
+        href={linkedinUrl}
+        target="_blank"
+        rel="noopener noreferrer me"
+      >
+        <span class="mail-fallback-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20.45 20.45h-3.56V14.9c0-1.32-.02-3.02-1.84-3.02-1.84 0-2.12 1.44-2.12 2.92v5.65H9.37V9h3.41v1.56h.05c.48-.9 1.64-1.84 3.37-1.84 3.6 0 4.27 2.37 4.27 5.46v6.27zM5.34 7.43a2.07 2.07 0 1 1 0-4.13 2.07 2.07 0 0 1 0 4.13zM7.12 20.45H3.55V9h3.57v11.45zM22.22 0H1.77C.8 0 0 .78 0 1.73v20.54C0 23.22.8 24 1.77 24h20.45c.98 0 1.78-.78 1.78-1.73V1.73C24 .78 23.2 0 22.22 0z" />
+          </svg>
+        </span>
+        <span class="mail-fallback-body">
+          <span class="mail-fallback-title">Direktnachricht auf LinkedIn</span>
+          <span class="mail-fallback-sub">Funktioniert immer, auch ohne Auth.</span>
+        </span>
+        <span class="mail-fallback-arrow" aria-hidden="true">↗</span>
+      </a>
+
+      <footer class="mail-card-footer">
+        <a class="mail-card-back" href="/">← braum.me</a>
+        <span class="mail-card-time" id="mailFooterTime" aria-hidden="true"></span>
+      </footer>
+    </article>
+  </main>
+
+  <script>
+    const t = document.getElementById("mailFooterTime");
+    function tick() {
+      if (!t) return;
+      t.textContent = new Intl.DateTimeFormat("de-DE", {
+        timeZone: "Europe/Berlin",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(new Date());
+    }
+    tick();
+    setInterval(tick, 30000);
+
+    document.getElementById("mailFallback")?.addEventListener("click", () => {
+      try {
+        window.umami?.track("Mail · LinkedIn Fallback", { source: "/mail" });
+      } catch {
+        /* ignore */
+      }
+    });
+  </script>
+</BaseLayout>

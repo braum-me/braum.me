@@ -1,0 +1,248 @@
+---
+/**
+ * braum.me · Routing-Card
+ * Ein Viewport, keine Conversation. Identity-Block + 3 Link-Gruppen + Name-Gate für Mail.
+ */
+
+import { getContact } from "~/lib/contact.ts";
+import LinkCard from "./LinkCard.astro";
+import MailGate from "./MailGate.astro";
+
+const contact = getContact();
+
+const footerLabel = "BRAUM.ME · SELF-HOSTED · SINNTAL · DE";
+
+type BrandIcon = "sb" | "cb" | "ae";
+type OutlineIcon = "linkedin" | "github";
+
+type LinkDef = {
+  key: string;
+  label: string;
+  sub: string;
+  reveal: string;
+  href: string;
+  icon: BrandIcon | OutlineIcon;
+  external: boolean;
+};
+
+const working: LinkDef[] = [
+  {
+    key: "consulting",
+    label: "braum.consulting",
+    sub: "Beratung für den Mittelstand",
+    reveal: "→ Erstgespräch kostenlos · 30 min",
+    href: contact.urlConsulting || "https://braum.consulting",
+    icon: "cb",
+    external: true,
+  },
+  {
+    key: "aboutexport",
+    label: "aboutexport.com",
+    sub: "Export Control Compliance SaaS",
+    reveal: "→ Beta · Waitlist offen",
+    href: contact.urlAboutexport || "https://aboutexport.com",
+    icon: "ae",
+    external: true,
+  },
+];
+
+const reading: LinkDef[] = [
+  {
+    key: "hub",
+    label: "stefanbraum.de",
+    sub: "Profil und Stationen",
+    reveal: "→ CV · Stationen · Essays",
+    href: contact.url || "https://stefanbraum.de",
+    icon: "sb",
+    external: true,
+  },
+];
+
+const connecting: LinkDef[] = [
+  {
+    key: "linkedin",
+    label: "LinkedIn",
+    sub: contact.urlLinkedin ? contact.urlLinkedin.replace(/^https?:\/\/(www\.)?/, "") : "linkedin.com",
+    reveal: "→ Aktiv · wöchentliche Posts",
+    href: contact.urlLinkedin || "https://linkedin.com",
+    icon: "linkedin",
+    external: true,
+  },
+  {
+    key: "github",
+    label: "GitHub",
+    sub: contact.urlGithub ? contact.urlGithub.replace(/^https?:\/\/(www\.)?/, "") : "github.com",
+    reveal: "→ Open-Source · Side-Projects",
+    href: contact.urlGithub || "https://github.com",
+    icon: "github",
+    external: true,
+  },
+];
+---
+
+<div class="card-wrap">
+  <article class="card" aria-label="Routing-Karte">
+    <header class="card-header">
+      <a href="/" class="brand-mono" aria-label="braum.me · Start">
+        <span class="monogram">SB<span class="dot">.</span></span>
+      </a>
+    </header>
+
+    <section class="identity" aria-labelledby="identity-name">
+      <h1 class="name" id="identity-name">Stefan Braum<span class="dot">.</span></h1>
+      <p class="tagline">IT-Leadership, KI und Digitalisierung im Mittelstand.</p>
+      <p class="sub">
+        Deputy Global Head of IT/SAP @ ODW-Elektrik · Founder Braum Consulting
+      </p>
+    </section>
+
+    <nav class="link-groups" aria-label="Anlaufstellen">
+      <div class="link-group" data-group="profile">
+        <div class="eyebrow"><span class="eyebrow-bar" aria-hidden="true"></span>PROFIL</div>
+        {reading.map((l) => <LinkCard {...l} />)}
+      </div>
+
+      <div class="link-group" data-group="working">
+        <div class="eyebrow"><span class="eyebrow-bar" aria-hidden="true"></span>ARBEITEN</div>
+        {working.map((l) => <LinkCard {...l} />)}
+      </div>
+
+      <div class="link-group" data-group="connecting">
+        <div class="eyebrow"><span class="eyebrow-bar" aria-hidden="true"></span>VERNETZEN</div>
+        {connecting.map((l) => <LinkCard {...l} />)}
+
+        <button
+          type="button"
+          class="link link-action"
+          data-link-key="mail"
+          id="mailTrigger"
+          aria-expanded="false"
+          aria-controls="mailPanel"
+        >
+          <span class="link-icon link-icon-mail" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="5" width="18" height="14" rx="2" />
+              <path d="m3 7 9 6 9-6" />
+            </svg>
+          </span>
+          <span class="link-body">
+            <span class="link-title">E-Mail</span>
+            <span class="link-sub">Name angeben, Mail bekommen</span>
+          </span>
+          <span class="link-arrow" aria-hidden="true">→</span>
+        </button>
+
+        <div class="mail-panel" id="mailPanel" hidden>
+          <MailGate variant="compact" />
+        </div>
+      </div>
+    </nav>
+
+    <footer class="card-footer">
+      <span class="footer-label">{footerLabel}</span>
+      <span class="footer-time" id="footerTime" aria-hidden="true"></span>
+    </footer>
+  </article>
+</div>
+
+<script>
+  declare global {
+    interface Window {
+      umami?: {
+        track: (name: string, data?: Record<string, unknown>) => void;
+      };
+    }
+  }
+
+  const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ===== Footer time ===== */
+  const timeEl = document.getElementById("footerTime");
+  function formatTime(): string {
+    return new Intl.DateTimeFormat("de-DE", {
+      timeZone: "Europe/Berlin",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(new Date());
+  }
+  function tickTime() {
+    if (timeEl) timeEl.textContent = formatTime();
+  }
+  tickTime();
+  setInterval(tickTime, 30000);
+
+  /* ===== URL params: ?focus= highlights a link ===== */
+  const params = new URLSearchParams(window.location.search);
+  const focus = params.get("focus");
+  const FOCUS_MAP: Record<string, string> = {
+    consulting: "consulting",
+    aboutexport: "aboutexport",
+    hiring: "hub",
+    cv: "hub",
+    writing: "hub",
+  };
+  const focusKey = focus ? FOCUS_MAP[focus] : null;
+  if (focusKey) {
+    const focused = document.querySelector<HTMLElement>(`[data-link-key="${focusKey}"]`);
+    focused?.classList.add("is-focused");
+  }
+
+  /* ===== Umami: track link clicks ===== */
+  function track(event: string, data?: Record<string, unknown>) {
+    try {
+      window.umami?.track(event, data);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  document.querySelectorAll<HTMLAnchorElement>(".link[data-link-key]").forEach((a) => {
+    const key = a.dataset.linkKey ?? "";
+    const label = a.querySelector<HTMLElement>(".link-title")?.textContent?.trim() ?? key;
+    a.addEventListener("click", () => {
+      track(`Link · ${label}`, { key, label });
+    });
+  });
+
+  /* ===== Mail panel: expand-toggle wraps the embedded MailGate ===== */
+  const mailTrigger = document.getElementById("mailTrigger") as HTMLButtonElement | null;
+  const mailPanel = document.getElementById("mailPanel") as HTMLElement | null;
+  const firstNameInput = mailPanel?.querySelector<HTMLInputElement>("[data-mail-name]") ?? null;
+
+  function openMail() {
+    if (!mailPanel || !mailTrigger) return;
+    mailPanel.hidden = false;
+    mailTrigger.setAttribute("aria-expanded", "true");
+    mailTrigger.classList.add("is-expanded");
+    requestAnimationFrame(() => {
+      mailPanel.classList.add("is-open");
+      firstNameInput?.focus();
+    });
+    track("Link · E-Mail", { key: "mail", label: "E-Mail" });
+  }
+
+  function closeMail() {
+    if (!mailPanel || !mailTrigger) return;
+    mailPanel.classList.remove("is-open");
+    mailTrigger.setAttribute("aria-expanded", "false");
+    mailTrigger.classList.remove("is-expanded");
+    const delay = prefersReduced ? 0 : 180;
+    setTimeout(() => {
+      if (mailPanel.classList.contains("is-open")) return;
+      mailPanel.hidden = true;
+    }, delay);
+  }
+
+  mailTrigger?.addEventListener("click", () => {
+    const expanded = mailTrigger.getAttribute("aria-expanded") === "true";
+    if (expanded) closeMail();
+    else openMail();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && mailTrigger?.getAttribute("aria-expanded") === "true") {
+      closeMail();
+      mailTrigger.focus();
+    }
+  });
+</script>

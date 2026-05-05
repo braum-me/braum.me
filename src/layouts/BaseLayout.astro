@@ -1,0 +1,201 @@
+---
+import { getContact } from "~/lib/contact.ts";
+import { env } from "~/lib/env.ts";
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "Stefan Braum · braum.me",
+  description = "Stefan Braum. IT-Leadership, KI und Digitalisierung im Mittelstand.",
+} = Astro.props;
+
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? "https://braum.me").toString();
+
+const umamiScript = env("UMAMI_SCRIPT_URL");
+const umamiWebsiteId = env("UMAMI_WEBSITE_ID");
+const umamiEnabled = Boolean(umamiScript && umamiWebsiteId);
+
+const contact = getContact();
+const sameAs = [
+  contact.urlLinkedin,
+  contact.urlGithub,
+  contact.url,
+  contact.urlConsulting,
+  contact.urlAboutexport,
+].filter(Boolean);
+---
+
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#0D3D2E" />
+
+    <link rel="canonical" href={canonicalUrl} />
+    <link rel="icon" type="image/png" href="/logo-sb.png" />
+    <link rel="apple-touch-icon" href="/logo-sb.png" />
+
+    <!-- OG -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:site_name" content="braum.me" />
+    <meta property="og:locale" content="de_DE" />
+    <meta property="og:image" content={new URL("/og.png", Astro.site ?? "https://braum.me").toString()} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="braum.me · Stefan Braum · Deputy Global Head of IT/SAP, Founder Braum Consulting" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL("/og.png", Astro.site ?? "https://braum.me").toString()} />
+
+    <script
+      type="application/ld+json"
+      is:inline
+      set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Person",
+        name: "Stefan Braum",
+        jobTitle: "Deputy Global Head of IT/SAP",
+        worksFor: [
+          { "@type": "Organization", name: "ODW-Elektrik" },
+          contact.urlConsulting
+            ? { "@type": "Organization", name: "Braum Consulting", url: contact.urlConsulting }
+            : { "@type": "Organization", name: "Braum Consulting" },
+        ],
+        url: "https://braum.me",
+        image: new URL("/s-clean.png", Astro.site ?? "https://braum.me").toString(),
+        sameAs,
+        knowsAbout: [
+          "IT Leadership",
+          "SAP",
+          "Enterprise Architecture",
+          "Digital Transformation",
+          "AI Integration",
+          "Marketing Strategy",
+        ],
+        address: { "@type": "PostalAddress", addressLocality: "Sinntal", addressCountry: "DE" },
+      })}
+    />
+
+    {
+      umamiEnabled && (
+        <script is:inline defer src={umamiScript} data-website-id={umamiWebsiteId} data-do-not-track="true" />
+      )
+    }
+  </head>
+  <body>
+    <div class="spotlight" id="spotlight" aria-hidden="true"></div>
+    <div class="ambient-dots" id="ambient-dots" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+
+    <slot />
+
+    <script>
+      /* ============================================================
+         Ambient interactions: spotlight + monogram parallax + dots
+         Alle zusammen auf einem einzigen rAF-Loop.
+         ============================================================ */
+      const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      if (!prefersReduced) {
+        const spotlight = document.getElementById("spotlight");
+        const monogram = document.querySelector<HTMLElement>(".monogram");
+        const dotsLayer = document.getElementById("ambient-dots");
+
+        let targetX = 0.5;
+        let targetY = 0.5;
+        let mouseX = 0.5;
+        let mouseY = 0.5;
+        let rafHandle = 0;
+
+        const onMove = (e: MouseEvent) => {
+          targetX = e.clientX / window.innerWidth;
+          targetY = e.clientY / window.innerHeight;
+        };
+
+        const tick = () => {
+          mouseX += (targetX - mouseX) * 0.08;
+          mouseY += (targetY - mouseY) * 0.08;
+
+          if (spotlight) {
+            spotlight.style.setProperty("--mx", `${mouseX * 100}%`);
+            spotlight.style.setProperty("--my", `${mouseY * 100}%`);
+          }
+
+          if (monogram) {
+            // Strong tilt: up to ~18° per axis
+            const rect = monogram.getBoundingClientRect();
+            const cx = (rect.left + rect.width / 2) / window.innerWidth;
+            const cy = (rect.top + rect.height / 2) / window.innerHeight;
+            const dx = (mouseX - cx) * 36;
+            const dy = (mouseY - cy) * -36;
+            monogram.style.transform = `rotateY(${dx}deg) rotateX(${dy}deg) translateZ(0)`;
+          }
+
+          if (dotsLayer) {
+            const px = (mouseX - 0.5) * 60;
+            const py = (mouseY - 0.5) * 60;
+            dotsLayer.style.setProperty("--px", `${px}px`);
+            dotsLayer.style.setProperty("--py", `${py}px`);
+          }
+
+          rafHandle = requestAnimationFrame(tick);
+        };
+
+        window.addEventListener("mousemove", onMove, { passive: true });
+
+        if (monogram) {
+          window.addEventListener("mousemove", () => monogram.classList.add("tilting"), {
+            passive: true,
+            once: true,
+          });
+        }
+
+        rafHandle = requestAnimationFrame(tick);
+        window.addEventListener("beforeunload", () => cancelAnimationFrame(rafHandle));
+      }
+
+      /* ============================================================
+         Ambient Dots · floating particles (LOUD mode)
+         ============================================================ */
+      const dots = document.getElementById("ambient-dots");
+      if (dots && !prefersReduced) {
+        const count = 55;
+        const frag = document.createDocumentFragment();
+        for (let i = 0; i < count; i++) {
+          const d = document.createElement("span");
+          d.className = "ambient-dot";
+          const size = Math.random() * 2.4 + 1.4;
+          const tx = Math.random() * 100;
+          const ty = Math.random() * 100;
+          const dur = 10 + Math.random() * 20;
+          const delay = -Math.random() * dur;
+          const opacity = 0.3 + Math.random() * 0.5;
+          const hue = Math.random() < 0.35 ? "mint" : "cream";
+          d.dataset.hue = hue;
+          d.style.setProperty("--size", `${size}px`);
+          d.style.setProperty("--tx", `${tx}%`);
+          d.style.setProperty("--ty", `${ty}%`);
+          d.style.setProperty("--dur", `${dur}s`);
+          d.style.setProperty("--delay", `${delay}s`);
+          d.style.setProperty("--op", `${opacity}`);
+          frag.appendChild(d);
+        }
+        dots.appendChild(frag);
+      }
+    </script>
+  </body>
+</html>
