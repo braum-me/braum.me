@@ -42,6 +42,7 @@ Siehe `.env.example`. Zusammenfassung:
 | `CONTACT_URL` | ja | "Hub" · Ziel für `stefanbraum.de`-Link |
 | `CONTACT_URL_CONSULTING` | ja | Ziel für Consulting-Link |
 | `CONTACT_URL_ABOUTEXPORT` | ja | Ziel für SaaS-Link |
+| `CONTACT_URL_BRAUMDEV` | ja | Ziel für Labs-Link |
 | `CONTACT_URL_LINKEDIN` | ja | Ziel für LinkedIn-Link |
 | `CONTACT_URL_GITHUB` | ja | Ziel für GitHub-Link |
 | `UMAMI_SCRIPT_URL`, `UMAMI_WEBSITE_ID` | nein | Analytics wenn beide gesetzt |
@@ -69,7 +70,7 @@ Für gezielte Shares und Audience-Targeting:
 
 ## Umami-Events (wenn aktiviert)
 
-- `Link · {label}` bei jedem Klick auf eine Anlaufstelle (LinkedIn, GitHub, stefanbraum.de, braum.consulting, aboutexport.com)
+- `Link · {label}` bei jedem Klick auf eine Anlaufstelle (LinkedIn, GitHub, stefanbraum.de, braum.consulting, aboutexport.com, braum.dev)
 - `Link · E-Mail` beim Öffnen des Mail-Panels
 - `Kontakt · {name}` / `Consulting · {name}` bei erfolgreichem Mail-Reveal (Property `{ name, type }`)
 
@@ -88,6 +89,7 @@ Für gezielte Shares und Audience-Targeting:
    CONTACT_URL=https://your-hub.example
    CONTACT_URL_CONSULTING=https://your-consulting.example
    CONTACT_URL_ABOUTEXPORT=https://your-saas.example
+   CONTACT_URL_BRAUMDEV=https://your-labs.example
    CONTACT_URL_LINKEDIN=https://www.linkedin.com/in/your-handle
    CONTACT_URL_GITHUB=https://github.com/your-handle
    UMAMI_SCRIPT_URL=https://umami.example.com/script.js

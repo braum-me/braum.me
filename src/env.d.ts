@@ -10,6 +10,7 @@ declare namespace NodeJS {
     CONTACT_URL: string;
     CONTACT_URL_CONSULTING: string;
     CONTACT_URL_ABOUTEXPORT: string;
+    CONTACT_URL_BRAUMDEV: string;
     CONTACT_URL_LINKEDIN: string;
     CONTACT_URL_GITHUB: string;
     CAPTCHA_SECRET?: string;

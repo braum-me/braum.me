@@ -9,6 +9,7 @@ export interface Contact {
   url: string;
   urlConsulting: string;
   urlAboutexport: string;
+  urlBraumDev: string;
   urlLinkedin: string;
   urlGithub: string;
 }
@@ -23,6 +24,7 @@ export function getContact(): Contact {
     url: env("CONTACT_URL") ?? "",
     urlConsulting: env("CONTACT_URL_CONSULTING") ?? "",
     urlAboutexport: env("CONTACT_URL_ABOUTEXPORT") ?? "",
+    urlBraumDev: env("CONTACT_URL_BRAUMDEV") ?? "",
     urlLinkedin: env("CONTACT_URL_LINKEDIN") ?? "",
     urlGithub: env("CONTACT_URL_GITHUB") ?? "",
   };

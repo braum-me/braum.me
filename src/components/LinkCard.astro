@@ -3,7 +3,7 @@
  * Single routing link card: icon (brand monogram or outline svg) + title + sub + reveal + arrow.
  */
 
-type BrandIcon = "sb" | "cb" | "ae";
+type BrandIcon = "sb" | "cb" | "ae" | "bd";
 type OutlineIcon = "linkedin" | "github";
 
 interface Props {
@@ -17,8 +17,9 @@ interface Props {
 }
 
 const { key, label, sub, reveal, href, icon, external } = Astro.props;
-const isBrand = icon === "sb" || icon === "cb" || icon === "ae";
-const monogramText = icon === "sb" ? "SB" : icon === "cb" ? "CB" : "AE";
+const isBrand = icon === "sb" || icon === "cb" || icon === "ae" || icon === "bd";
+const monogramText =
+  icon === "sb" ? "SB" : icon === "cb" ? "CB" : icon === "ae" ? "AE" : "BD";
 ---
 
 <a
