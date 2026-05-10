@@ -28,6 +28,7 @@ pnpm dev                # http://localhost:4321
 | `pnpm check` | TypeScript- und Astro-Diagnosen |
 | `pnpm lint` | Biome-Checks |
 | `pnpm format` | Biome-Format write |
+| `pnpm og:build` | OG-Bilder neu rendern (`public/og/*.png` aus `src/lib/og.ts`) |
 
 ## Environment
 
@@ -110,24 +111,38 @@ docker run --rm -p 4321:4321 --env-file .env braum-me
 
 ```
 src/
-├── assets/brand/signature.svg
 ├── components/
-│   └── RoutingCard.astro        # Identity + 3 Link-Gruppen + Mail-Gate
+│   ├── LinkCard.astro           # Single routing-link card (icon + title + sub + reveal)
+│   ├── MailGate.astro           # Name-Gate + Captcha → reveals email
+│   └── RoutingCard.astro        # Identity + 3 Link-Gruppen + Mail-Trigger
 ├── layouts/BaseLayout.astro     # Umami-Script, OG, JSON-LD, Ambient-Layers
 ├── lib/
+│   ├── captcha.ts               # HMAC-signed math captcha (stateless)
 │   ├── contact.ts               # Env → typed Contact (Mails + Routing-URLs)
 │   ├── env.ts                   # Env-Helper (process.env + import.meta.env fallback)
+│   ├── og.ts                    # OG-Card SVG renderer + card definitions
 │   └── rate-limit.ts            # In-memory Rate-Limiter
 ├── pages/
-│   ├── index.astro
+│   ├── index.astro              # Homepage
+│   ├── mail.astro               # /mail standalone Kontakt-Seite
 │   └── api/
+│       ├── captcha.ts           # GET issues challenge
 │       ├── contact.ts           # Name-Gate → Mail
 │       └── health.ts            # Coolify-Healthcheck
 └── styles/global.css            # Tokens, Ambient, Routing-Card, Mobile
+
+scripts/
+└── build-og.ts                  # Renders src/lib/og.ts cards → public/og/*.png
+
+assets/fonts-og/                 # TTFs für OG-Rendering (Inter, Geist, JetBrains Mono)
 
 public/
 ├── logo-sb.png                  # Stefan Braum Brand (Favicon, stefanbraum.de-Link)
 ├── logo-cb.png                  # Braum Consulting Brand (braum.consulting-Link)
 ├── s-clean.png                  # Portrait (Schema.org image)
-└── og.png                       # 1200×630 Share-Preview
+├── og/
+│   ├── default.png              # 1200×630 Share-Preview Homepage
+│   └── mail.png                 # 1200×630 Share-Preview /mail
+├── robots.txt
+└── sitemap.xml
 ```

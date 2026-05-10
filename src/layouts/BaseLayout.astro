@@ -6,14 +6,19 @@ import "../styles/global.css";
 interface Props {
   title?: string;
   description?: string;
+  ogImage?: "default" | "mail";
+  ogImageAlt?: string;
 }
 
 const {
   title = "Stefan Braum · braum.me",
   description = "Stefan Braum. IT-Leadership, KI und Digitalisierung im Mittelstand.",
+  ogImage = "default",
+  ogImageAlt = "braum.me · Stefan Braum · Deputy Global Head of IT/SAP, Founder Braum Consulting",
 } = Astro.props;
 
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? "https://braum.me").toString();
+const ogImageUrl = new URL(`/og/${ogImage}.png`, Astro.site ?? "https://braum.me").toString();
 
 const umamiScript = env("UMAMI_SCRIPT_URL");
 const umamiWebsiteId = env("UMAMI_WEBSITE_ID");
@@ -52,15 +57,17 @@ const sameAs = [
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:site_name" content="braum.me" />
     <meta property="og:locale" content="de_DE" />
-    <meta property="og:image" content={new URL("/og.png", Astro.site ?? "https://braum.me").toString()} />
+    <meta property="og:image" content={ogImageUrl} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="braum.me · Stefan Braum · Deputy Global Head of IT/SAP, Founder Braum Consulting" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:alt" content={ogImageAlt} />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={new URL("/og.png", Astro.site ?? "https://braum.me").toString()} />
+    <meta name="twitter:image" content={ogImageUrl} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
 
     <script
       type="application/ld+json"

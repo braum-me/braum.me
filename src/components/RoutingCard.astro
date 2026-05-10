@@ -71,7 +71,9 @@ const connecting: LinkDef[] = [
   {
     key: "linkedin",
     label: "LinkedIn",
-    sub: contact.urlLinkedin ? contact.urlLinkedin.replace(/^https?:\/\/(www\.)?/, "") : "linkedin.com",
+    sub: contact.urlLinkedin
+      ? contact.urlLinkedin.replace(/^https?:\/\/(www\.)?/, "")
+      : "linkedin.com",
     reveal: "→ Aktiv · wöchentliche Posts",
     href: contact.urlLinkedin || "https://linkedin.com",
     icon: "linkedin",

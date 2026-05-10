@@ -230,17 +230,53 @@ body::after {
     0 0 0 1px rgba(0, 200, 150, 0.08),
     inset 0 1px 0 rgba(242, 239, 228, 0.08);
   backdrop-filter: blur(20px) saturate(140%);
-  opacity: 0;
-  transform: translateY(12px) scale(0.98);
-  animation: cardIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
 }
 
-@keyframes cardIn {
+/* ============================================================
+   Entry stagger · sequential reveal of card contents
+   Pure CSS, single keyframe, per-element delay via custom prop.
+   ============================================================ */
+@keyframes entryRise {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: none;
   }
 }
+
+.card-header,
+.identity > .name,
+.identity > .tagline,
+.identity > .sub,
+.link-group .eyebrow,
+.link-group > .link,
+.card-footer {
+  opacity: 0;
+  animation: entryRise 0.55s cubic-bezier(0.22, 1, 0.36, 1) var(--enter-delay, 0ms) forwards;
+}
+
+.card-header         { --enter-delay:    0ms; }
+.identity > .name    { --enter-delay:   60ms; }
+.identity > .tagline { --enter-delay:  140ms; }
+.identity > .sub     { --enter-delay:  220ms; }
+
+.link-group[data-group="profile"]    > :nth-child(1) { --enter-delay: 320ms; }
+.link-group[data-group="profile"]    > :nth-child(2) { --enter-delay: 380ms; }
+
+.link-group[data-group="working"]    > :nth-child(1) { --enter-delay: 460ms; }
+.link-group[data-group="working"]    > :nth-child(2) { --enter-delay: 520ms; }
+.link-group[data-group="working"]    > :nth-child(3) { --enter-delay: 580ms; }
+.link-group[data-group="working"]    > :nth-child(4) { --enter-delay: 640ms; }
+
+.link-group[data-group="connecting"] > :nth-child(1) { --enter-delay: 720ms; }
+.link-group[data-group="connecting"] > :nth-child(2) { --enter-delay: 780ms; }
+.link-group[data-group="connecting"] > :nth-child(3) { --enter-delay: 840ms; }
+.link-group[data-group="connecting"] > :nth-child(4) { --enter-delay: 900ms; }
+
+.card-footer         { --enter-delay:  980ms; }
 
 /* ---- Header ---- */
 .card-header {
@@ -398,7 +434,9 @@ body::after {
   border-color: var(--mint);
   background: #2f8264;
   box-shadow: 0 10px 24px rgba(0, 200, 150, 0.2), 0 0 0 1px rgba(0, 200, 150, 0.45);
-  animation: focusPulse 2.4s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  animation:
+    entryRise 0.55s cubic-bezier(0.22, 1, 0.36, 1) var(--enter-delay, 0ms) forwards,
+    focusPulse 2.4s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--enter-delay, 0ms) + 0.6s) infinite;
 }
 
 @keyframes focusPulse {
@@ -784,10 +822,27 @@ body::after {
     0 0 0 1px rgba(0, 200, 150, 0.08),
     inset 0 1px 0 rgba(242, 239, 228, 0.08);
   backdrop-filter: blur(20px) saturate(140%);
-  opacity: 0;
-  transform: translateY(12px) scale(0.98);
-  animation: cardIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
 }
+
+/* /mail · entry stagger */
+.mail-card > .mail-card-header,
+.mail-card-intro > .mail-card-title,
+.mail-card-intro > .mail-card-sub,
+.mail-card > .mail-gate,
+.mail-card > .mail-divider,
+.mail-card > .mail-fallback,
+.mail-card > .mail-card-footer {
+  opacity: 0;
+  animation: entryRise 0.55s cubic-bezier(0.22, 1, 0.36, 1) var(--enter-delay, 0ms) forwards;
+}
+
+.mail-card > .mail-card-header        { --enter-delay:    0ms; }
+.mail-card-intro > .mail-card-title   { --enter-delay:   80ms; }
+.mail-card-intro > .mail-card-sub     { --enter-delay:  180ms; }
+.mail-card > .mail-gate               { --enter-delay:  280ms; }
+.mail-card > .mail-divider            { --enter-delay:  420ms; }
+.mail-card > .mail-fallback           { --enter-delay:  500ms; }
+.mail-card > .mail-card-footer        { --enter-delay:  640ms; }
 
 .mail-card-header {
   display: flex;
@@ -1169,8 +1224,19 @@ body::after {
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+  .card-header,
+  .identity > *,
+  .link-group .eyebrow,
+  .link-group > .link,
+  .card-footer,
+  .mail-card > *,
+  .mail-card-intro > * {
+    opacity: 1 !important;
+    transform: none !important;
   }
   .spotlight,
   .ambient-dots {
