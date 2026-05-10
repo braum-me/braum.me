@@ -1,16 +1,25 @@
 .env
 .env.local
+.env.production
 .env.*.local
 node_modules/
 __pycache__/
 *.pyc
 .DS_Store
+Thumbs.db
 dist/
 build/
 .astro/
+.cache/
 .vscode/
 .idea/
 *.log
 coverage/
 pnpm-debug.log*
+
+# Database / backup dumps
+*.sql
+*.dump
+*.backup
+
 CLAUDE.md

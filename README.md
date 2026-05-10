@@ -1,12 +1,12 @@
 # braum.me
 
-Digitale Visitenkarte als **Routing-Karte**. Identity-Block + drei Link-Gruppen (Arbeiten · Lesen · Vernetzen). Ein Viewport, kein Scroll auf Desktop. Mail-Reveal hinter leichtem Name-Gate (personal / consulting getrennt).
+Digital business card as a **routing card**. Identity block + three link groups (Working · Reading · Connecting). One viewport, no scroll on desktop. Mail reveal behind a lightweight name gate (personal / consulting kept separate).
 
 ## Stack
 
-- Astro 5 · SSR via Node-Adapter
+- Astro 5 · SSR via Node adapter
 - TypeScript strict · Tailwind 4 · Biome
-- Self-hosted Fonts (Geist, Inter, JetBrains Mono) via `@fontsource-variable`
+- Self-hosted fonts (Geist, Inter, JetBrains Mono) via `@fontsource-variable`
 - Umami Analytics (self-hosted, optional via env)
 - Docker multi-stage · Node 22 Alpine
 
@@ -14,73 +14,73 @@ Digitale Visitenkarte als **Routing-Karte**. Identity-Block + drei Link-Gruppen 
 
 ```bash
 pnpm install
-cp .env.example .env   # Kontakt-Mails, Routing-URLs und optional Umami eintragen
+cp .env.example .env   # fill in contact emails, routing URLs, optional Umami
 pnpm dev                # http://localhost:4321
 ```
 
 ## Scripts
 
-| Kommando | Zweck |
+| Command | Purpose |
 |---|---|
-| `pnpm dev` | Lokaler Dev-Server |
-| `pnpm build` | Astro-Check + Production-Build |
-| `pnpm preview` | Production-Build lokal prüfen |
-| `pnpm check` | TypeScript- und Astro-Diagnosen |
-| `pnpm lint` | Biome-Checks |
-| `pnpm format` | Biome-Format write |
-| `pnpm og:build` | OG-Bilder neu rendern (`public/og/*.png` aus `src/lib/og.ts`) |
+| `pnpm dev` | Local dev server |
+| `pnpm build` | Astro check + production build |
+| `pnpm preview` | Preview the production build locally |
+| `pnpm check` | TypeScript and Astro diagnostics |
+| `pnpm lint` | Biome checks |
+| `pnpm format` | Biome format write |
+| `pnpm og:build` | Re-render OG images (`public/og/*.png` from `src/lib/og.ts`) |
 
 ## Environment
 
-Siehe `.env.example`. Zusammenfassung:
+See `.env.example`. Summary:
 
-| Variable | Pflicht | Zweck |
+| Variable | Required | Purpose |
 |---|---|---|
-| `CONTACT_NAME` | ja | Anzeigename |
-| `CONTACT_EMAIL` | ja | Persönliche Mail (Mail-Gate, Typ "personal") |
-| `CONTACT_EMAIL_CONSULTING` | ja | Consulting-Mail (Mail-Gate, Typ "consulting") |
-| `CONTACT_ORG`, `CONTACT_TITLE` | ja | Anzeige-Daten |
-| `CONTACT_URL` | ja | "Hub" · Ziel für `stefanbraum.de`-Link |
-| `CONTACT_URL_CONSULTING` | ja | Ziel für Consulting-Link |
-| `CONTACT_URL_ABOUTEXPORT` | ja | Ziel für SaaS-Link |
-| `CONTACT_URL_BRAUMDEV` | ja | Ziel für Labs-Link |
-| `CONTACT_URL_LINKEDIN` | ja | Ziel für LinkedIn-Link |
-| `CONTACT_URL_GITHUB` | ja | Ziel für GitHub-Link |
-| `UMAMI_SCRIPT_URL`, `UMAMI_WEBSITE_ID` | nein | Analytics wenn beide gesetzt |
-| `HOST`, `PORT` | nein | Defaults `0.0.0.0` / `4321` |
-| `RATE_LIMIT_MAX`, `RATE_LIMIT_WINDOW_MS` | nein | Kontakt-API-Limit (Default 5/15min) |
+| `CONTACT_NAME` | yes | Display name |
+| `CONTACT_EMAIL` | yes | Personal email (mail gate, type "personal") |
+| `CONTACT_EMAIL_CONSULTING` | yes | Consulting email (mail gate, type "consulting") |
+| `CONTACT_ORG`, `CONTACT_TITLE` | yes | Display data |
+| `CONTACT_URL` | yes | "Hub" · target for the `stefanbraum.de` link |
+| `CONTACT_URL_CONSULTING` | yes | Target for the consulting link |
+| `CONTACT_URL_ABOUTEXPORT` | yes | Target for the SaaS link |
+| `CONTACT_URL_BRAUMDEV` | yes | Target for the labs link |
+| `CONTACT_URL_LINKEDIN` | yes | Target for the LinkedIn link |
+| `CONTACT_URL_GITHUB` | yes | Target for the GitHub link |
+| `UMAMI_SCRIPT_URL`, `UMAMI_WEBSITE_ID` | no | Analytics enabled when both are set |
+| `HOST`, `PORT` | no | Defaults `0.0.0.0` / `4321` |
+| `RATE_LIMIT_MAX`, `RATE_LIMIT_WINDOW_MS` | no | Contact-API limit (default 5 / 15min) |
 
-**`.env` nie committen.**
+**Never commit `.env`.**
 
-## API-Routes
+## API routes
 
-| Route | Zweck |
+| Route | Purpose |
 |---|---|
-| `POST /api/contact` | Body `{ name, type?: "personal" \| "consulting" }`, liefert Mail aus env. Rate-limited |
-| `GET /api/health` | Healthcheck für Coolify |
+| `POST /api/contact` | Body `{ name, type?: "personal" \| "consulting" }`, returns the email from env. Rate-limited. |
+| `GET /api/health` | Healthcheck for Coolify |
 
-## URL-Parameter
+## URL parameters
 
-Für gezielte Shares und Audience-Targeting:
+For targeted shares and audience-specific landings:
 
-| Param | Effekt |
+| Param | Effect |
 |---|---|
-| `?focus=consulting` | Highlight auf den `braum.consulting`-Link (Pulse-Ring) |
-| `?focus=aboutexport` | Highlight auf den `aboutexport.com`-Link |
-| `?focus=hiring` / `?focus=cv` / `?focus=writing` | Highlight auf `stefanbraum.de` |
+| `?focus=consulting` | Highlights the `braum.consulting` link (pulse ring) |
+| `?focus=aboutexport` | Highlights the `aboutexport.com` link |
+| `?focus=hiring` / `?focus=cv` / `?focus=writing` | Highlights `stefanbraum.de` |
 
-## Umami-Events (wenn aktiviert)
+## Umami events (when enabled)
 
-- `Link · {label}` bei jedem Klick auf eine Anlaufstelle (LinkedIn, GitHub, stefanbraum.de, braum.consulting, aboutexport.com, braum.dev)
-- `Link · E-Mail` beim Öffnen des Mail-Panels
-- `Kontakt · {name}` / `Consulting · {name}` bei erfolgreichem Mail-Reveal (Property `{ name, type }`)
+- `Link · {label}` on every click on a destination (LinkedIn, GitHub, stefanbraum.de, braum.consulting, aboutexport.com, braum.dev)
+- `Link · E-Mail` when the mail panel is opened
+- `Kontakt · {name}` / `Consulting · {name}` on a successful mail reveal (property `{ name, type }`)
 
 ## Deploy · Coolify
 
-1. **Repo in Coolify anlegen** · Source: Git-Remote deiner Wahl · Branch `main`
-2. **Build-Pack:** Dockerfile (auto-detected)
+1. **Add the repo to Coolify** · Source: any Git remote · Branch `main`
+2. **Build pack:** Dockerfile (auto-detected)
 3. **Port:** `4321`
-4. **Environment-Variablen** im Coolify-UI setzen (Platzhalter, echte Werte im Coolify-UI ergänzen):
+4. **Environment variables** in the Coolify UI (placeholders — set the real values in the Coolify UI):
    ```
    CONTACT_NAME=Your Name
    CONTACT_EMAIL=you@example.com
@@ -96,53 +96,57 @@ Für gezielte Shares und Audience-Targeting:
    UMAMI_SCRIPT_URL=https://umami.example.com/script.js
    UMAMI_WEBSITE_ID=00000000-0000-0000-0000-000000000000
    ```
-5. **Domain** `braum.me` mit Let's-Encrypt-Zertifikat
-6. **Healthcheck-Pfad:** `/api/health`
-7. **Deploy** · Git-Webhook triggert auto-redeploy bei push auf `main`
+5. **Domain** `braum.me` with a Let's Encrypt certificate
+6. **Healthcheck path:** `/api/health`
+7. **Deploy** · Git webhook triggers auto-redeploy on push to `main`
 
-## Lokal mit Docker testen
+## Local Docker test
 
 ```bash
 docker build -t braum-me .
 docker run --rm -p 4321:4321 --env-file .env braum-me
 ```
 
-## Struktur
+## Structure
 
 ```
 src/
 ├── components/
 │   ├── LinkCard.astro           # Single routing-link card (icon + title + sub + reveal)
-│   ├── MailGate.astro           # Name-Gate + Captcha → reveals email
-│   └── RoutingCard.astro        # Identity + 3 Link-Gruppen + Mail-Trigger
-├── layouts/BaseLayout.astro     # Umami-Script, OG, JSON-LD, Ambient-Layers
+│   ├── MailGate.astro           # Name gate + captcha → reveals email
+│   └── RoutingCard.astro        # Identity + 3 link groups + mail trigger
+├── layouts/BaseLayout.astro     # Umami script, OG, JSON-LD, ambient layers
 ├── lib/
 │   ├── captcha.ts               # HMAC-signed math captcha (stateless)
-│   ├── contact.ts               # Env → typed Contact (Mails + Routing-URLs)
-│   ├── env.ts                   # Env-Helper (process.env + import.meta.env fallback)
-│   ├── og.ts                    # OG-Card SVG renderer + card definitions
-│   └── rate-limit.ts            # In-memory Rate-Limiter
+│   ├── contact.ts               # Env → typed Contact (emails + routing URLs)
+│   ├── env.ts                   # Env helper (process.env + import.meta.env fallback)
+│   ├── og.ts                    # OG-card SVG renderer + card definitions
+│   └── rate-limit.ts            # In-memory rate limiter
 ├── pages/
 │   ├── index.astro              # Homepage
-│   ├── mail.astro               # /mail standalone Kontakt-Seite
+│   ├── mail.astro               # /mail standalone contact page
 │   └── api/
 │       ├── captcha.ts           # GET issues challenge
-│       ├── contact.ts           # Name-Gate → Mail
-│       └── health.ts            # Coolify-Healthcheck
-└── styles/global.css            # Tokens, Ambient, Routing-Card, Mobile
+│       ├── contact.ts           # Name gate → mail
+│       └── health.ts            # Coolify healthcheck
+└── styles/global.css            # Tokens, ambient, routing card, mobile
 
 scripts/
 └── build-og.ts                  # Renders src/lib/og.ts cards → public/og/*.png
 
-assets/fonts-og/                 # TTFs für OG-Rendering (Inter, Geist, JetBrains Mono)
+assets/fonts-og/                 # TTFs for OG rendering (Inter, Geist, JetBrains Mono)
 
 public/
-├── logo-sb.png                  # Stefan Braum Brand (Favicon, stefanbraum.de-Link)
-├── logo-cb.png                  # Braum Consulting Brand (braum.consulting-Link)
+├── logo-sb.png                  # Personal brand (favicon, hub link)
+├── logo-cb.png                  # Consulting brand (consulting link)
 ├── s-clean.png                  # Portrait (Schema.org image)
 ├── og/
-│   ├── default.png              # 1200×630 Share-Preview Homepage
-│   └── mail.png                 # 1200×630 Share-Preview /mail
+│   ├── default.png              # 1200×630 share preview, homepage
+│   └── mail.png                 # 1200×630 share preview, /mail
 ├── robots.txt
 └── sitemap.xml
 ```
+
+## License
+
+MIT — see [LICENSE](./LICENSE).
