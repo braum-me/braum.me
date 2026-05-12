@@ -109,17 +109,17 @@ const connecting: LinkDef[] = [
 
     <nav class="link-groups" aria-label="Anlaufstellen">
       <div class="link-group" data-group="profile">
-        <div class="eyebrow"><span class="eyebrow-bar" aria-hidden="true"></span>PROFIL</div>
+        <h2 class="eyebrow"><span class="eyebrow-bar" aria-hidden="true"></span>PROFIL</h2>
         {reading.map((l) => <LinkCard {...l} />)}
       </div>
 
       <div class="link-group" data-group="working">
-        <div class="eyebrow"><span class="eyebrow-bar" aria-hidden="true"></span>ARBEITEN</div>
+        <h2 class="eyebrow"><span class="eyebrow-bar" aria-hidden="true"></span>ARBEITEN</h2>
         {working.map((l) => <LinkCard {...l} />)}
       </div>
 
       <div class="link-group" data-group="connecting">
-        <div class="eyebrow"><span class="eyebrow-bar" aria-hidden="true"></span>VERNETZEN</div>
+        <h2 class="eyebrow"><span class="eyebrow-bar" aria-hidden="true"></span>VERNETZEN</h2>
         {connecting.map((l) => <LinkCard {...l} />)}
 
         <button

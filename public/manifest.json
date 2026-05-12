@@ -1,0 +1,13 @@
+{
+  "name": "Stefan Braum · braum.me",
+  "short_name": "braum.me",
+  "description": "IT-Leadership, KI und Digitalisierung im Mittelstand. Alle Anlaufstellen auf einen Blick.",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#0D3D2E",
+  "background_color": "#030f0b",
+  "lang": "de",
+  "icons": [
+    { "src": "/logo-sb.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
