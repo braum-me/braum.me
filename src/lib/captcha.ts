@@ -11,7 +11,11 @@ import { env } from "./env.ts";
 const TTL_MS = 10 * 60 * 1000;
 
 function getSecret(): string {
-  return env("CAPTCHA_SECRET") ?? "braum.me-default-captcha-secret-change-in-prod";
+  const secret = env("CAPTCHA_SECRET");
+  if (!secret) {
+    throw new Error("CAPTCHA_SECRET is not set. Generate one with `openssl rand -hex 32` and set it in your environment.");
+  }
+  return secret;
 }
 
 function b64url(buf: Buffer | string): string {

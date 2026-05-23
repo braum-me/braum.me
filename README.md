@@ -2,6 +2,10 @@
 
 Digital business card as a **routing card**. Identity block + three link groups (Working · Reading · Connecting). One viewport, no scroll on desktop. Mail reveal behind a lightweight name gate (personal / consulting kept separate).
 
+**Live:** [braum.me](https://braum.me)
+
+![Preview](.github/preview.png)
+
 ## Stack
 
 - Astro 5 · SSR via Node adapter
@@ -46,6 +50,7 @@ See `.env.example`. Summary:
 | `CONTACT_URL_BRAUMDEV` | yes | Target for the labs link |
 | `CONTACT_URL_LINKEDIN` | yes | Target for the LinkedIn link |
 | `CONTACT_URL_GITHUB` | yes | Target for the GitHub link |
+| `CAPTCHA_SECRET` | yes | HMAC key for the math captcha. Generate with `openssl rand -hex 32`. App refuses to boot without it. |
 | `UMAMI_SCRIPT_URL`, `UMAMI_WEBSITE_ID` | no | Analytics enabled when both are set |
 | `HOST`, `PORT` | no | Defaults `0.0.0.0` / `4321` |
 | `RATE_LIMIT_MAX`, `RATE_LIMIT_WINDOW_MS` | no | Contact-API limit (default 5 / 15min) |

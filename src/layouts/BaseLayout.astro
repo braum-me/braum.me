@@ -47,8 +47,11 @@ const sameAs = [
     <meta name="theme-color" content="#0D3D2E" />
 
     <link rel="canonical" href={canonicalUrl} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" href="/logo-sb.png" />
     <link rel="apple-touch-icon" href="/logo-sb.png" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="author" content="Stefan Braum" />
 
     <!-- OG -->
     <meta property="og:type" content="website" />
@@ -64,6 +67,8 @@ const sameAs = [
     <meta property="og:image:alt" content={ogImageAlt} />
 
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@stefanbraum" />
+    <meta name="twitter:creator" content="@stefanbraum" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageUrl} />
@@ -72,30 +77,43 @@ const sameAs = [
     <script
       type="application/ld+json"
       is:inline
-      set:html={JSON.stringify({
-        "@context": "https://schema.org",
-        "@type": "Person",
-        name: "Stefan Braum",
-        jobTitle: "Deputy Global Head of IT/SAP",
-        worksFor: [
-          { "@type": "Organization", name: "ODW-Elektrik" },
-          contact.urlConsulting
-            ? { "@type": "Organization", name: "Braum Consulting", url: contact.urlConsulting }
-            : { "@type": "Organization", name: "Braum Consulting" },
-        ],
-        url: "https://braum.me",
-        image: new URL("/s-clean.png", Astro.site ?? "https://braum.me").toString(),
-        sameAs,
-        knowsAbout: [
-          "IT Leadership",
-          "SAP",
-          "Enterprise Architecture",
-          "Digital Transformation",
-          "AI Integration",
-          "Marketing Strategy",
-        ],
-        address: { "@type": "PostalAddress", addressLocality: "Sinntal", addressCountry: "DE" },
-      })}
+      set:html={JSON.stringify([
+        {
+          "@context": "https://schema.org",
+          "@type": "Person",
+          "@id": "https://braum.me/#stefan-braum",
+          name: "Stefan Braum",
+          description:
+            "Stefan Braum ist IT-Leader und Unternehmensberater aus dem Mittelstand. Deputy Global Head of IT/SAP bei ODW-Elektrik, Gründer von Braum Consulting – Spezialist für IT-Leadership, KI-Integration und digitale Transformation im Mittelstand.",
+          jobTitle: "Deputy Global Head of IT/SAP",
+          worksFor: [
+            { "@type": "Organization", name: "ODW-Elektrik", url: "https://www.odw.de" },
+            contact.urlConsulting
+              ? { "@type": "Organization", name: "Braum Consulting", url: contact.urlConsulting }
+              : { "@type": "Organization", name: "Braum Consulting" },
+          ],
+          url: "https://braum.me",
+          image: new URL("/s-clean.png", Astro.site ?? "https://braum.me").toString(),
+          sameAs,
+          knowsAbout: [
+            "IT Leadership",
+            "SAP",
+            "Enterprise Architecture",
+            "Digital Transformation",
+            "AI Integration",
+            "Marketing Strategy",
+          ],
+          address: { "@type": "PostalAddress", addressLocality: "Sinntal", addressCountry: "DE" },
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "@id": "https://braum.me/#website",
+          url: "https://braum.me",
+          name: "braum.me",
+          publisher: { "@id": "https://braum.me/#stefan-braum" },
+        },
+      ])}
     />
 
     {
@@ -174,6 +192,14 @@ const sameAs = [
 
         rafHandle = requestAnimationFrame(tick);
         window.addEventListener("beforeunload", () => cancelAnimationFrame(rafHandle));
+
+        document.addEventListener("visibilitychange", () => {
+          if (document.visibilityState === "hidden") {
+            cancelAnimationFrame(rafHandle);
+          } else {
+            rafHandle = requestAnimationFrame(tick);
+          }
+        });
       }
 
       /* ============================================================
