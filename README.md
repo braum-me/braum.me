@@ -47,7 +47,8 @@ See `.env.example`. Summary:
 | `CONTACT_URL` | yes | "Hub" · target for the `stefanbraum.de` link |
 | `CONTACT_URL_CONSULTING` | yes | Target for the consulting link |
 | `CONTACT_URL_ABOUTEXPORT` | yes | Target for the SaaS link |
-| `CONTACT_URL_BRAUMDEV` | yes | Target for the labs link |
+| `CONTACT_URL_AGIJETZT` | no | Target for the `agi.jetzt` link (default `https://agi.jetzt`) |
+| `CONTACT_URL_BRAUMDEV` | no | `braum.dev` URL · no longer a card link, only listed in JSON-LD `sameAs` |
 | `CONTACT_URL_LINKEDIN` | yes | Target for the LinkedIn link |
 | `CONTACT_URL_GITHUB` | yes | Target for the GitHub link |
 | `CAPTCHA_SECRET` | yes | HMAC key for the math captcha. Generate with `openssl rand -hex 32`. App refuses to boot without it. |
@@ -72,11 +73,12 @@ For targeted shares and audience-specific landings:
 |---|---|
 | `?focus=consulting` | Highlights the `braum.consulting` link (pulse ring) |
 | `?focus=aboutexport` | Highlights the `aboutexport.com` link |
+| `?focus=agi` | Highlights the `agi.jetzt` link |
 | `?focus=hiring` / `?focus=cv` / `?focus=writing` | Highlights `stefanbraum.de` |
 
 ## Umami events (when enabled)
 
-- `Link · {label}` on every click on a destination (LinkedIn, GitHub, stefanbraum.de, braum.consulting, aboutexport.com, braum.dev)
+- `Link · {label}` on every click on a destination (LinkedIn, GitHub, stefanbraum.de, braum.consulting, aboutexport.com, agi.jetzt)
 - `Link · E-Mail` when the mail panel is opened
 - `Kontakt · {name}` / `Consulting · {name}` on a successful mail reveal (property `{ name, type }`)
 

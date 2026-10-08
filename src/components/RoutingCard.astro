@@ -12,7 +12,7 @@ const contact = getContact();
 
 const footerLabel = "BRAUM.ME · SELF-HOSTED · SINNTAL · DE";
 
-type BrandIcon = "sb" | "cb" | "ae" | "bd";
+type BrandIcon = "sb" | "cb" | "ae" | "aj";
 type OutlineIcon = "linkedin" | "github";
 
 type LinkDef = {
@@ -45,12 +45,12 @@ const working: LinkDef[] = [
     external: true,
   },
   {
-    key: "braumdev",
-    label: "braum.dev",
-    sub: "Labs und Tools",
-    reveal: "→ Side-Projects · Tools · Experimente",
-    href: contact.urlBraumDev || "https://braum.dev",
-    icon: "bd",
+    key: "agijetzt",
+    label: "agi.jetzt",
+    sub: "Wie nah sind wir an AGI?",
+    reveal: "→ AI-Newsfeed · AGI-Progress · Work-AI-Benchmarks",
+    href: contact.urlAgiJetzt || "https://agi.jetzt",
+    icon: "aj",
     external: true,
   },
 ];
@@ -188,6 +188,7 @@ const connecting: LinkDef[] = [
   const FOCUS_MAP: Record<string, string> = {
     consulting: "consulting",
     aboutexport: "aboutexport",
+    agi: "agijetzt",
     hiring: "hub",
     cv: "hub",
     writing: "hub",
